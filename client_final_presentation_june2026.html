@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Budapest rental price prediction — ingatlan.com × CEU capstone</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #fff7f0;
+      --surface-2: #f6f6f6;
+      --text: #111111;
+      --muted: #666666;
+      --line: #dedede;
+      --orange: #f58220;
+      --orange-dark: #c85f00;
+      --black: #111111;
+      --green: #138a36;
+      --red: #b42318;
+      --blue: #1f5eff;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    }
+    #deck { height: 100vh; overflow: hidden; position: relative; }
+    .slide {
+      display: none;
+      height: 100vh;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2.1rem 3.2rem 4rem;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .slide.active { display: flex; }
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.1rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+      letter-spacing: 0.01em;
+    }
+    .brand-lockup { display: flex; align-items: center; gap: 0.65rem; white-space: nowrap; }
+    .ingatlan-logo {
+      font-weight: 850;
+      font-size: 1.05rem;
+      color: var(--black);
+      letter-spacing: -0.02em;
+    }
+    .ingatlan-logo .dot { color: var(--orange); }
+    .ceu-badge {
+      border: 2px solid var(--black);
+      color: var(--black);
+      font-weight: 850;
+      padding: 0.12rem 0.45rem;
+      border-radius: 3px;
+      letter-spacing: 0.03em;
+      line-height: 1.1;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    .slide h1 {
+      font-size: 2.2rem;
+      line-height: 1.08;
+      letter-spacing: -0.045em;
+      font-weight: 820;
+      margin-bottom: 0.7rem;
+      color: var(--black);
+    }
+    .slide h2 {
+      color: var(--orange-dark);
+      font-size: 1.18rem;
+      font-weight: 780;
+      margin: 1rem 0 0.45rem;
+      letter-spacing: -0.02em;
+    }
+    .slide h3 {
+      color: var(--black);
+      font-size: 1rem;
+      font-weight: 760;
+      margin: 0 0 0.35rem;
+    }
+    .slide p, .slide li {
+      font-size: 1.02rem;
+      line-height: 1.42;
+      color: var(--text);
+    }
+    .slide ul { margin: 0.35rem 0; padding-left: 1.22rem; }
+    .slide li { margin: 0.28rem 0; }
+    .muted { color: var(--muted) !important; }
+    .small { font-size: 0.86rem !important; }
+    .large { font-size: 1.18rem !important; }
+    .orange { color: var(--orange-dark); }
+    code {
+      background: #f3f3f3;
+      border: 1px solid #e5e5e5;
+      padding: 0.05rem 0.25rem;
+      border-radius: 4px;
+      font-size: 0.86em;
+    }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.35rem; align-items: start; }
+    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; align-items: stretch; }
+    .four-col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; align-items: stretch; }
+    @media (max-width: 900px) {
+      .slide { padding: 1.6rem 1.4rem 4rem; }
+      .two-col, .three-col, .four-col { grid-template-columns: 1fr; }
+      .slide h1 { font-size: 1.8rem; }
+    }
+    .card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 14px;
+      padding: 1rem 1.05rem;
+      box-shadow: var(--shadow);
+    }
+    .card.orange-card {
+      border-color: rgba(245, 130, 32, 0.35);
+      background: linear-gradient(180deg, #fffaf5 0%, #fff 100%);
+    }
+    .metric {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      min-height: 7.2rem;
+    }
+    .metric .value {
+      color: var(--orange-dark);
+      font-weight: 860;
+      font-size: 2rem;
+      letter-spacing: -0.055em;
+    }
+    .metric .label { color: var(--black); font-weight: 740; font-size: 0.98rem; }
+    .metric .note { color: var(--muted); font-size: 0.8rem; line-height: 1.25; }
+    .callout {
+      border-left: 5px solid var(--orange);
+      background: var(--surface);
+      padding: 0.8rem 1rem;
+      border-radius: 0 12px 12px 0;
+      margin: 0.8rem 0;
+      box-shadow: 0 4px 16px rgba(245, 130, 32, 0.08);
+    }
+    .callout.black { border-left-color: var(--black); background: var(--surface-2); }
+    .callout.green { border-left-color: var(--green); background: #f0fff4; }
+    .callout.red { border-left-color: var(--red); background: #fff5f5; }
+    table.simple {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin: 0.35rem 0;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    table.simple th, table.simple td {
+      border: 1px solid #e8e8e8;
+      padding: 0.43rem 0.55rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.simple th {
+      background: #111;
+      color: #fff;
+      font-weight: 720;
+    }
+    table.simple td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border: 1px solid rgba(245,130,32,0.45);
+      background: #fff7f0;
+      color: var(--orange-dark);
+      border-radius: 999px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin: 0.12rem 0.15rem 0.12rem 0;
+    }
+    .timeline { margin-top: 0.45rem; }
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 10rem 1fr;
+      gap: 0.9rem;
+      align-items: start;
+      border-left: 3px solid var(--orange);
+      padding: 0 0 0.7rem 0.9rem;
+      position: relative;
+    }
+    .timeline-row::before {
+      content: "";
+      width: 0.68rem;
+      height: 0.68rem;
+      border-radius: 50%;
+      background: var(--orange);
+      position: absolute;
+      left: -0.39rem;
+      top: 0.18rem;
+      box-shadow: 0 0 0 4px #fff;
+    }
+    .timeline-row strong { color: var(--black); }
+    .artifact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; }
+    .artifact-card a { color: var(--orange-dark); font-weight: 760; text-decoration: none; }
+    .artifact-card a:hover { text-decoration: underline; }
+    canvas { max-height: 330px !important; }
+    .chart-box { min-height: 330px; }
+    .img-frame {
+      width: 100%;
+      max-height: 475px;
+      object-fit: contain;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .map-frame {
+      width: 100%;
+      height: 64vh;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      background: #fff;
+    }
+    .appendix-banner {
+      display: inline-block;
+      background: var(--black);
+      color: #fff;
+      border-radius: 999px;
+      padding: 0.28rem 0.7rem;
+      font-size: 0.82rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+    .footer-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.55rem 1.3rem;
+      border-top: 1px solid var(--line);
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(8px);
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      z-index: 10;
+    }
+    .footer-bar kbd {
+      background: #f4f4f4;
+      border: 1px solid #d8d8d8;
+      border-bottom-color: #c2c2c2;
+      border-radius: 4px;
+      padding: 0.08rem 0.35rem;
+      color: var(--black);
+    }
+    .cover {
+      justify-content: center;
+      padding-bottom: 6rem;
+    }
+    .cover h1 { font-size: 3.15rem; max-width: 980px; }
+    .cover-subtitle { font-size: 1.25rem !important; max-width: 880px; color: var(--muted) !important; }
+    .cover-rule { width: 110px; height: 8px; background: var(--orange); border-radius: 999px; margin: 1.2rem 0; }
+  </style>
+</head>
+<body>
+<div id="deck">
+
+  <section class="slide active cover" data-slide="1">
+    <div class="topline">
+      <div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span>×</span><span class="ceu-badge">CEU</span></div>
+      <div>Client-facing final working session · June 2026</div>
+    </div>
+    <h1>Budapest rental price prediction for listing upload</h1>
+    <div class="cover-rule"></div>
+    <p class="cover-subtitle">A reproducible capstone artifact for ingatlan.com’s data team: warehouse-to-model pipeline, temporal validation, geospatial enrichment, model diagnostics, maps, and product recommendations.</p>
+    <p class="muted" style="margin-top:2rem;"><strong>Bálint Décsi</strong> · MSc Business Analytics · Central European University</p>
+  </section>
+
+  <section class="slide" data-slide="2">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Executive summary</div></div>
+    <h1>Executive summary</h1>
+    <div class="three-col">
+      <div class="card metric orange-card"><span class="value">~9.8%</span><span class="label">best CV MdAPE</span><span class="note">Below the client-side 10% success criterion on time-ordered CV.</span></div>
+      <div class="card metric"><span class="value">50,898</span><span class="label">strict modelling rows</span><span class="note">Budapest rental flats after downstream scope and quality filters, through 2026-06-02.</span></div>
+      <div class="card metric"><span class="value">+17.6%</span><span class="label">test-period rent shift</span><span class="note">Median HUF/sqm is higher in the reserved newest 20%; temporal validation is necessary.</span></div>
+    </div>
+    <div class="callout">
+      <strong>Recommendation:</strong> treat the current artifact as a strong offline benchmark and feature-readiness package: it meets the client-side 10% CV MdAPE success criterion, but is not a production go-live approval yet. The next business gate is a frozen holdout run, district/subtype stability checks, and coverage review for the upload UX.
+    </div>
+    <ul>
+      <li>Size/layout, condition, local comparable rent, and amenity fields carry the strongest model signal.</li>
+      <li>Geospatial features are now programmatic and historized: lagged WorldPop population and Sentinel-2 NDVI at H3 resolutions.</li>
+      <li>Text/NLP was intentionally deferred: the upload journey and existing numeric feature collection make structured fields the first priority.</li>
+    </ul>
+  </section>
+
+  <section class="slide" data-slide="3">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Business decision</div></div>
+    <h1>The decision this work supports</h1>
+    <div class="two-col">
+      <div class="card orange-card">
+        <h2>Product question</h2>
+        <p>Can ingatlan.com provide a credible rent suggestion during listing upload so landlords price competitively and reduce time-on-market?</p>
+        <p class="muted small">The capstone focuses on offline modelling and recommendation support, not production deployment or A/B testing.</p>
+      </div>
+      <div class="card">
+        <h2>Model framing</h2>
+        <ul>
+          <li><strong>Scope:</strong> Budapest rental flats.</li>
+          <li><strong>Target:</strong> monthly rent per square metre in HUF.</li>
+          <li><strong>Metric:</strong> MdAPE — typical absolute % miss.</li>
+          <li><strong>Success criterion:</strong> ≤10% MdAPE, set by the client.</li>
+          <li><strong>Guardrails:</strong> coverage, district stability, subtype stability, and future time-on-market linkage.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="4">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Whole timeframe</div></div>
+    <h1>Whole timeframe: what was built</h1>
+    <div class="timeline">
+      <div class="timeline-row"><div><strong>30 Mar – early Apr</strong></div><div>Project initiation, sponsor framing, analytics brief, repository structure, uv environment, source dictionaries.</div></div>
+      <div class="timeline-row"><div><strong>April</strong></div><div>Bronze → silver → gold warehouse notebooks, local modelling extract, Budapest rental scope, first EDA, missingness/data-quality checks, transparent OLS baseline.</div></div>
+      <div class="timeline-row"><div><strong>7 May interim</strong></div><div>Interim deck presented: temporal validation discipline, candidate model leaderboard, early feature importance, and open questions on time series/geography.</div></div>
+      <div class="timeline-row"><div><strong>Mid–late May</strong></div><div>Instructor/client feedback addressed: comparable OLS in the same CV framework, refreshed missingness, geospatial feature work, 90-day neighborhood prior, SHAP/permutation importance exports.</div></div>
+      <div class="timeline-row"><div><strong>June</strong></div><div>Client-facing artifact package: presentation, model leaderboard, maps, feature diagnostics, pipeline documentation, and recommended path to pilot decision.</div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="5">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Since interim</div></div>
+    <h1>What changed since the interim presentation</h1>
+    <div class="two-col">
+      <div class="card">
+        <h2>Methodology fixes</h2>
+        <ul>
+          <li>OLS is now evaluated as <code>ols_log_price_per_sqm</code> in the same time-series CV as tree models.</li>
+          <li>The earlier OLS-vs-LightGBM split mismatch is no longer used as an apples-to-apples claim.</li>
+          <li>Refreshed missingness resolves the <code>building_floor_count</code> contradiction: ~21.7% missing, not 100%.</li>
+        </ul>
+      </div>
+      <div class="card orange-card">
+        <h2>New technical content</h2>
+        <ul>
+          <li>Lagged WorldPop and NDVI H3 feature pipelines.</li>
+          <li>Maps for 2025 listing prices, population context, GHSL probe, and NDVI.</li>
+          <li>Neighborhood comparable-rent prior with 90-day lookback and local characteristic deltas.</li>
+          <li>SHAP, permutation importance, and native model importance artifacts.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="6">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Artifact package</div></div>
+    <h1>The artifact package</h1>
+    <div class="artifact-grid">
+      <div class="card artifact-card"><h3>Warehouse + modelling notebooks</h3><p class="small"><code>dev/notebooks/01</code>–<code>04</code>, <code>10</code>, <code>11</code>, <code>20</code>, <code>21</code>, <code>22</code></p><p class="muted small">Reproducible path from warehouse layers to EDA, geo EDA, CV comparison, tuning, and holdout notebook scaffold.</p></div>
+      <div class="card artifact-card"><h3>Model reports</h3><p class="small"><a href="../../dev/reports/20_model_leaderboard.csv">20_model_leaderboard.csv</a><br/><a href="../../dev/reports/20_model_feature_importance.csv">20_model_feature_importance.csv</a><br/><a href="../../dev/reports/21_model_tuning_results.csv">21_model_tuning_results.csv</a></p><p class="muted small">CSV outputs for review, dashboarding, or handoff.</p></div>
+      <div class="card artifact-card"><h3>Maps + visuals</h3><p class="small"><a href="../../dev/visualization/11_geo_2025_price_listing_map.html">Price map</a><br/><a href="../../dev/visualization/11_geo_worldpop_2024_listing_map.html">WorldPop map</a><br/><a href="../../dev/visualization/11_geo_ndvi_h3_r8_map.html">NDVI H3 map</a></p><p class="muted small">Portable HTML maps and PNG explainability charts.</p></div>
+      <div class="card artifact-card"><h3>Documentation</h3><p class="small"><a href="real_estate_rental_price_prediction_project_brief.md">Project brief</a><br/><a href="../reference/warehouse_modeling_decisions.md">Warehouse/model decisions</a><br/><a href="../reference/warehouse_data_dictionary.md">Data dictionary</a></p><p class="muted small">Decision trace for modelling choices and leakage rules.</p></div>
+      <div class="card artifact-card"><h3>Model artifacts</h3><p class="small"><code>dev/models/*.joblib</code></p><p class="muted small">Saved candidate and tuned estimators for offline reproducibility.</p></div>
+      <div class="card artifact-card"><h3>This presentation</h3><p class="small"><code>docs/project/client_final_presentation_june2026.html</code></p><p class="muted small">Client-facing story; technical depth pushed to appendix.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="7">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Data + validation</div></div>
+    <h1>Data and validation design</h1>
+    <div class="four-col">
+      <div class="card metric"><span class="value">40,718</span><span class="label">train rows</span><span class="note">2021-01-01 → 2025-11-29</span></div>
+      <div class="card metric"><span class="value">10,180</span><span class="label">reserved test rows</span><span class="note">2025-11-29 → 2026-06-02</span></div>
+      <div class="card metric orange-card"><span class="value">4,524</span><span class="label">train median HUF/sqm</span><span class="note">monthly rent per sqm</span></div>
+      <div class="card metric orange-card"><span class="value">5,319</span><span class="label">test median HUF/sqm</span><span class="note">newer listings are materially pricier</span></div>
+    </div>
+    <div class="callout">
+      The extract was refreshed through 2026-06-02, effectively current for this June presentation. The newest 20% is reserved because a random split would leak market regime information. Candidate selection uses time-ordered CV on older listings; production go/no-go should use the frozen holdout once.
+    </div>
+  </section>
+
+  <section class="slide" data-slide="8">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Market movement</div></div>
+    <h1>Why temporal discipline matters</h1>
+    <div class="two-col">
+      <div class="card chart-box"><canvas id="chartTemporal"></canvas></div>
+      <div>
+        <h2>Observed pattern</h2>
+        <ul>
+          <li>Budapest rental HUF/sqm rose sharply after 2021 in the refreshed modelling sample.</li>
+          <li>The reserved 2025-11-29 → 2026-06-02 test period has a higher median price level than training.</li>
+          <li>Calendar and macro effects should not be learned from the future.</li>
+        </ul>
+        <div class="callout black"><strong>Implication:</strong> the model should be judged on out-of-time behaviour and district/subtype slices, not only average CV score.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="9">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Model comparison</div></div>
+    <h1>Comparable CV leaderboard</h1>
+    <p class="muted">Same target, same rolling time-series CV, same metric. Lower MdAPE is better.</p>
+    <div class="two-col">
+      <div class="card chart-box"><canvas id="chartLeaderboard"></canvas></div>
+      <div>
+        <h2>What this says</h2>
+        <ul>
+          <li>Top candidates are close: XGBoost, HistGradientBoosting, and LightGBM all sit around 9.8–9.9% CV MdAPE, clearing the client’s 10% criterion in CV.</li>
+          <li>OLS and Ridge are surprisingly competitive at ~10.1%; they are useful as transparent benchmarks.</li>
+          <li>The strongest improvement is versus simple baselines: district median is ~16.8% and dummy median is ~17.9%.</li>
+        </ul>
+        <div class="callout"><strong>Interpretation:</strong> a complex model helps, but the incremental gain over a well-specified linear/hedonic model is modest in CV. Stability and product fit matter.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="10">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Feature story</div></div>
+    <h1>What the model pays attention to</h1>
+    <div class="two-col">
+      <div class="card chart-box"><canvas id="chartFeatureImportance"></canvas></div>
+      <div>
+        <h2>Product-relevant feature groups</h2>
+        <p><span class="pill">size & layout</span><span class="pill">local comparables</span><span class="pill">condition</span><span class="pill">balcony ratio</span><span class="pill">air conditioning</span><span class="pill">centrality / coordinates</span></p>
+        <ul>
+          <li>Filling the core structured fields matters more than adding NLP at this stage.</li>
+          <li>Neighborhood prior and location features show clear signal, validating the client team’s interim feedback.</li>
+          <li>Importance is not causality; use it for field prioritization and model sanity checks.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="11">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Feature story</div></div>
+    <h1>SHAP beeswarm: which features push predictions up or down</h1>
+    <div class="two-col">
+      <div class="card"><img class="img-frame" src="../../dev/visualization/20_best_model_shap_beeswarm.png" alt="SHAP beeswarm" /></div>
+      <div>
+        <h2>How to read it</h2>
+        <ul>
+          <li>Each dot is one sampled listing; horizontal position is the SHAP contribution to the predicted log HUF/sqm.</li>
+          <li>Dots to the right increase the model prediction; dots to the left decrease it.</li>
+          <li>Colour shows whether that feature value is high or low for the listing.</li>
+          <li>Use this for transparency and sanity checks, not as a causal statement.</li>
+        </ul>
+        <div class="callout"><strong>Product use:</strong> the same logic can support a local “what drives this estimate” explanation for a landlord-facing rent suggestion.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="12">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Feature engineering</div></div>
+    <h1>Interaction terms kept in the model</h1>
+    <p class="muted">The final feature policy avoids high-cardinality categorical interaction keys; it keeps a small set of numeric terms with clear formulas.</p>
+    <table class="simple">
+      <thead><tr><th>Term</th><th>Formula</th><th>Interpretation</th></tr></thead>
+      <tbody>
+        <tr><td><code>distance_x_log_area</code></td><td><code>distance_to_city_center_km × ln(area_size)</code></td><td>Centrality gradient can differ for small vs. large flats.</td></tr>
+        <tr><td><code>has_balcony_x_distance_to_center</code></td><td><code>1[balcony_size &gt; 0] × distance_to_city_center_km</code></td><td>Balcony premium may vary with centrality.</td></tr>
+        <tr><td><code>elevator_x_floor_num</code></td><td><code>1[has_elevator] × floor_num</code></td><td>Higher floors are valued differently when an elevator exists.</td></tr>
+        <tr><td><code>total_room_equiv_x_log_area</code></td><td><code>(room_count + 0.5 × small_room_count) × ln(area_size)</code></td><td>Layout usefulness interacts with flat size.</td></tr>
+        <tr><td><code>room_count_x_log_area</code></td><td><code>room_count × ln(area_size)</code></td><td>Room count can matter differently by size.</td></tr>
+        <tr><td><code>balcony_to_area_ratio</code></td><td><code>clip(balcony_size / area_size, 0, 0.5)</code></td><td>A bounded ratio, not simple multiplication.</td></tr>
+        <tr><td><code>room_density</code></td><td><code>(room_count + 0.5 × small_room_count) / area_size</code></td><td>Captures compactness of the layout.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout black"><strong>Why this matters:</strong> these terms let the model represent plausible housing-market effects without exploding the one-hot feature space.</div>
+  </section>
+
+  <section class="slide" data-slide="13">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Geospatial enrichment</div></div>
+    <h1>Geospatial enrichment is now an artifact, not just an idea</h1>
+    <div class="three-col">
+      <div class="card orange-card"><h2>WorldPop</h2><ul><li>Hungary rasters for 2020–2025.</li><li>H3 resolutions 6, 7, 8.</li><li>Total population and age/sex cohorts.</li><li>Lag rule: 2025 listing → 2024 features.</li></ul></div>
+      <div class="card orange-card"><h2>NDVI greenness</h2><ul><li>Sentinel-2 L2A via Microsoft Planetary Computer.</li><li>Summer composites for 2020–2025.</li><li>H3 mean / p90 / pixel count.</li><li>Prototype point coverage: ~100%.</li></ul></div>
+      <div class="card"><h2>Maps</h2><ul><li>2025 price listing map.</li><li>WorldPop map in the main deck; GHSL probe in the appendix.</li><li>NDVI anchor and H3 map.</li><li>All are portable local HTML artifacts.</li></ul></div>
+    </div>
+    <div class="callout black">Geospatial features should remain lagged and source-dated to avoid leakage. Static land cover is useful for EDA but less aligned with historized model validation.</div>
+  </section>
+
+  <section class="slide" data-slide="14">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Main deck map · 1/4</div></div>
+    <h1>Map: 2025 listing prices in Budapest</h1>
+    <iframe class="map-frame" src="../../dev/visualization/11_geo_2025_price_listing_map.html" title="2025 listing price map"></iframe>
+    <p class="muted small">Use this to inspect spatial clustering of high and low rent-per-square-metre listings in the most recent period.</p>
+  </section>
+
+  <section class="slide" data-slide="15">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Main deck map · 2/4</div></div>
+    <h1>Map: lagged WorldPop context</h1>
+    <iframe class="map-frame" src="../../dev/visualization/11_geo_worldpop_2024_listing_map.html" title="WorldPop 2024 listing map"></iframe>
+    <p class="muted small">2025 listing points sampled against 2024 population context, following the lag rule used to avoid geo-feature leakage.</p>
+  </section>
+
+  <section class="slide" data-slide="16">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Main deck map · 3/4</div></div>
+    <h1>Map: Sentinel-2 NDVI at H3 resolution 8</h1>
+    <iframe class="map-frame" src="../../dev/visualization/11_geo_ndvi_h3_r8_map.html" title="NDVI H3 r8 map"></iframe>
+    <p class="muted small">Historized summer greenness aggregated to local H3 cells; useful for checking whether green-space proxies behave plausibly around Budapest.</p>
+  </section>
+
+  <section class="slide" data-slide="17">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Main deck map · 4/4</div></div>
+    <h1>Map: NDVI anchor points</h1>
+    <iframe class="map-frame" src="../../dev/visualization/11_geo_ndvi_anchor_map.html" title="NDVI anchor map"></iframe>
+    <p class="muted small">Point-level validation artifact for the NDVI join, showing anchor listings and coverage before promoting NDVI to model features.</p>
+  </section>
+
+
+  <section class="slide" data-slide="18">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Product implications</div></div>
+    <h1>Implications for the upload flow</h1>
+    <div class="two-col">
+      <div class="card orange-card">
+        <h2>Fields worth prioritizing</h2>
+        <ul>
+          <li>Area and rooms / room density.</li>
+          <li>Condition, comfort, subtype, heating.</li>
+          <li>Balcony size relative to area.</li>
+          <li>Air conditioning and equipment flags.</li>
+          <li>High-quality location: district, zone, coordinates/street enough for local comparable signal.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Potential UX pattern</h2>
+        <ul>
+          <li>Predict HUF/sqm, multiply by area for total-rent suggestion.</li>
+          <li>Show a range rather than a point estimate if uncertainty is high.</li>
+          <li>Suppress suggestion when coverage or district/subtype reliability is poor.</li>
+          <li>Optionally show “what drives this estimate” using SHAP-style local explanation.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="19">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Risks</div></div>
+    <h1>Risks and mitigations</h1>
+    <table class="simple">
+      <thead><tr><th>Risk</th><th>Why it matters</th><th>Mitigation in the artifact</th></tr></thead>
+      <tbody>
+        <tr><td>Temporal leakage / drift</td><td>Budapest rental prices move quickly.</td><td>Chronological split, rolling CV, newest 20% holdout design.</td></tr>
+        <tr><td>Aggregate metric hides local failure</td><td>Districts/subtypes can behave differently.</td><td>Recommended district and property-subtype MdAPE slices before product claims.</td></tr>
+        <tr><td>Missing optional fields</td><td>A model can learn from data users do not always provide.</td><td>Pipeline imputation, refreshed missingness profile, coverage guardrail.</td></tr>
+        <tr><td>Scope creep to national rentals</td><td>Budapest-trained priors can misprice countryside listings.</td><td>Explicit Budapest pilot scope; national rollout requires retraining and validation.</td></tr>
+        <tr><td>Business metric gap</td><td>MdAPE improvement may not reduce time-on-market.</td><td>Define acceptance bands and later link predictions to time-on-market or experiment design.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="slide" data-slide="20">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Recommendation</div></div>
+    <h1>Recommended next steps with ingatlan.com</h1>
+    <div class="three-col">
+      <div class="card orange-card"><h2>1 · Freeze evaluation</h2><p>Run notebook 22 as a controlled one-shot holdout, then publish final MdAPE/MAPE/RMSE, total-rent errors, coverage, and district/subtype diagnostics.</p></div>
+      <div class="card orange-card"><h2>2 · Define UX bands</h2><p>Use the client’s 10% MdAPE criterion as the offline target, then decide how it maps to product behaviour: exact suggestion, range suggestion, or no suggestion.</p></div>
+      <div class="card orange-card"><h2>3 · Pilot safely</h2><p>Start with Budapest rental flats only, monitor input coverage and prediction drift, and use the artifact’s feature list to improve upload-field completion.</p></div>
+    </div>
+    <div class="callout green"><strong>Bottom line:</strong> the project produced a credible, reproducible offline model artifact and a practical roadmap. The remaining decision is product governance, not more exploratory modelling.</div>
+  </section>
+
+  <section class="slide" data-slide="21">
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Discussion</div></div>
+    <h1>Discussion questions</h1>
+    <div class="two-col">
+      <div class="card"><h2>For the data team</h2><ul><li>Which fields are guaranteed at the time the suggestion is shown?</li><li>Should the model optimize HUF/sqm, total rent, or a UI-specific loss?</li><li>What is the preferred production stack and latency budget?</li></ul></div>
+      <div class="card"><h2>For the director / sponsor</h2><ul><li>The client-side 10% MdAPE criterion is met in CV; is holdout performance sufficient for a pilot?</li><li>Would a range be more acceptable than a point estimate?</li><li>Which segment should be the first business pilot?</li></ul></div>
+    </div>
+    <p class="muted" style="margin-top:1.2rem;">Appendix follows with technical details, full tables, and additional SHAP/importance artifacts.</p>
+  </section>
+
+  <!-- Appendix -->
+
+  <section class="slide" data-slide="22">
+    <div class="appendix-banner">Appendix A — GHSL population probe map</div>
+    <h1>Map: GHSL population probe</h1>
+    <iframe class="map-frame" src="../../dev/visualization/11_geo_ghs_pop_listing_map.html" title="GHSL population probe map"></iframe>
+    <p class="muted small">Exploratory comparison source. Current GHSL file is useful for CRS and coverage testing, but not treated as the preferred lagged 2024 feature.</p>
+  </section>
+  <section class="slide" data-slide="23">
+    <div class="appendix-banner">Appendix B — full current CV leaderboard</div>
+    <h1>CV leaderboard table</h1>
+    <table class="simple">
+      <thead><tr><th>Model</th><th class="num">CV MdAPE</th><th class="num">CV MAPE</th><th class="num">MAE HUF/sqm</th><th>Comment</th></tr></thead>
+      <tbody>
+        <tr><td>XGBoost log price/sqm</td><td class="num">9.84%</td><td class="num">12.19%</td><td class="num">629</td><td>Best mean CV MdAPE.</td></tr>
+        <tr><td>HistGradientBoosting log price/sqm</td><td class="num">9.86%</td><td class="num">12.24%</td><td class="num">632</td><td>Very close, simpler sklearn dependency profile.</td></tr>
+        <tr><td>LightGBM log price/sqm</td><td class="num">9.94%</td><td class="num">12.33%</td><td class="num">635</td><td>Close candidate; no longer the sole interim frontrunner.</td></tr>
+        <tr><td>Ridge log price/sqm</td><td class="num">10.06%</td><td class="num">12.61%</td><td class="num">646</td><td>Transparent regularized linear benchmark.</td></tr>
+        <tr><td>OLS log price/sqm</td><td class="num">10.07%</td><td class="num">12.58%</td><td class="num">645</td><td>Comparable same-CV OLS baseline.</td></tr>
+        <tr><td>Random Forest</td><td class="num">10.78%</td><td class="num">13.29%</td><td class="num">693</td><td>Slower; weaker than boosting here.</td></tr>
+        <tr><td>Extra Trees</td><td class="num">11.33%</td><td class="num">13.67%</td><td class="num">717</td><td>High variance, weaker in this run.</td></tr>
+        <tr><td>District median HUF/sqm</td><td class="num">16.80%</td><td class="num">19.32%</td><td class="num">1,010</td><td>Transparent grouped baseline.</td></tr>
+        <tr><td>Dummy median</td><td class="num">17.95%</td><td class="num">20.26%</td><td class="num">1,067</td><td>Sanity baseline.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="slide" data-slide="24">
+    <div class="appendix-banner">Appendix C — fold-level stability</div>
+    <h1>Fold-level MdAPE for top candidates</h1>
+    <div class="card chart-box"><canvas id="chartFolds"></canvas></div>
+    <p class="muted small">Fold-level scores are from <code>dev/reports/20_model_cv_fold_metrics.csv</code>. The current target/features reduced the extreme fold instability shown in the interim deck, but holdout and district slices remain required.</p>
+  </section>
+
+  <section class="slide" data-slide="25">
+    <div class="appendix-banner">Appendix D — feature policy and leakage controls</div>
+    <h1>Model feature policy</h1>
+    <div class="two-col">
+      <div class="card"><h2>Included</h2><ul><li>Core property structure: area, rooms, floor, age.</li><li>Quality/amenity fields: condition, comfort, subtype, furnishment, heating, balcony, aircon.</li><li>Location: district and zone level 1 one-hot, coordinates, distance to center.</li><li>Fold-safe 90-day neighborhood prior and local deltas.</li><li>Lagged WorldPop and NDVI features.</li></ul></div>
+      <div class="card"><h2>Excluded / constrained</h2><ul><li><code>price_per_sqm_huf</code> is the target, never a feature.</li><li>Total <code>price_huf</code> is not a feature.</li><li>Street/geo-cell identifiers are not directly one-hot encoded.</li><li>Text bodies are not used; only language-presence flags.</li><li>Model-specific filters stay downstream of the gold warehouse.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="26">
+    <div class="appendix-banner">Appendix E — missingness and data quality</div>
+    <h1>Key data-quality points</h1>
+    <table class="simple">
+      <thead><tr><th>Check</th><th>Current artifact value</th><th>Action / interpretation</th></tr></thead>
+      <tbody>
+        <tr><td>Duplicate listing ID</td><td>0</td><td>OK in current EDA artifact.</td></tr>
+        <tr><td>Non-positive target / area</td><td>0</td><td>OK after downstream filters.</td></tr>
+        <tr><td>Invalid coordinates after Budapest bounds</td><td>598 rows (~1.1% in EDA extract)</td><td>Use coverage guardrail; avoid forced coordinate features when location quality is weak.</td></tr>
+        <tr><td><code>building_floor_count</code> missing</td><td>21.68%</td><td>Resolved interim contradiction; imputed inside CV folds.</td></tr>
+        <tr><td><code>common_charges</code> missing</td><td>72.16%</td><td>Useful when present but not safe as mandatory UI dependency.</td></tr>
+        <tr><td><code>utility_costs</code> missing</td><td>48.44%</td><td>Impute and monitor; potentially improve upload completion.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="slide" data-slide="27">
+    <div class="appendix-banner">Appendix F — SHAP group importance artifact</div>
+    <h1>SHAP group importance</h1>
+    <img class="img-frame" src="../../dev/visualization/20_best_model_shap_group_importance.png" alt="SHAP group importance" />
+    <p class="muted small">SHAP values explain log HUF/sqm predictions on a sample, so magnitudes are in log-points, not raw HUF. Use for explanation and sanity checks, not causal claims.</p>
+  </section>
+
+  <section class="slide" data-slide="28">
+    <div class="appendix-banner">Appendix G — permutation importance artifact</div>
+    <h1>Permutation importance</h1>
+    <img class="img-frame" src="../../dev/visualization/20_best_model_permutation_importance.png" alt="Permutation importance" />
+  </section>
+
+  <section class="slide" data-slide="29">
+    <div class="appendix-banner">Appendix H — technical/reproducibility map</div>
+    <h1>Where the work lives</h1>
+    <table class="simple">
+      <thead><tr><th>Area</th><th>Path</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Warehouse notebooks</td><td><code>dev/notebooks/01_warehouse_bronze_layer.ipynb</code> → <code>03_warehouse_gold_layer.ipynb</code></td><td>Layered data preparation.</td></tr>
+        <tr><td>Modelling dataset</td><td><code>dev/notebooks/04_build_modeling_dataset.ipynb</code></td><td>Scope filters and chronological split.</td></tr>
+        <tr><td>EDA</td><td><code>dev/notebooks/10_eda_rental_price_local.ipynb</code></td><td>Missingness, target, temporal and feature diagnostics.</td></tr>
+        <tr><td>Geo EDA</td><td><code>dev/notebooks/11_geo_eda.ipynb</code></td><td>WorldPop/GHSL/NDVI probes and maps.</td></tr>
+        <tr><td>Model comparison</td><td><code>dev/notebooks/20_rental_price_prediction.ipynb</code></td><td>CV leaderboard and explainability exports.</td></tr>
+        <tr><td>Tuning</td><td><code>dev/notebooks/21_rental_price_tuning.ipynb</code></td><td>Best-candidate hyperparameter search.</td></tr>
+        <tr><td>Holdout scaffold</td><td><code>dev/notebooks/22_rental_price_holdout_testing.ipynb</code></td><td>Reserved newest 20% evaluation path.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+
+<div class="footer-bar">
+  <span>ingatlan.com × CEU capstone · Budapest rental price prediction</span>
+  <span><kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> · slide <span id="cur">1</span> / <span id="tot">29</span></span>
+</div>
+
+<script>
+(function () {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  let i = 0;
+  const cur = document.getElementById('cur');
+  const tot = document.getElementById('tot');
+  tot.textContent = slides.length;
+
+  function show(n) {
+    i = (n + slides.length) % slides.length;
+    slides.forEach((s, j) => s.classList.toggle('active', j === i));
+    cur.textContent = i + 1;
+    window.location.hash = String(i + 1);
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); show(i + 1); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i - 1); }
+    if (e.key === 'Home') { e.preventDefault(); show(0); }
+    if (e.key === 'End') { e.preventDefault(); show(slides.length - 1); }
+  });
+  const hashSlide = parseInt(window.location.hash.replace('#', ''), 10);
+  show(Number.isFinite(hashSlide) ? hashSlide - 1 : 0);
+
+  if (typeof Chart === 'undefined') return;
+  Chart.defaults.font.family = 'Inter, Segoe UI, system-ui, sans-serif';
+  Chart.defaults.color = '#666666';
+  const gridColor = '#e5e5e5';
+  const orange = '#f58220';
+  const orangeLight = 'rgba(245, 130, 32, 0.55)';
+  const black = '#111111';
+
+  new Chart(document.getElementById('chartTemporal'), {
+    type: 'line',
+    data: {
+      labels: ['2021 Q1','2021 Q3','2022 Q1','2022 Q3','2023 Q1','2023 Q3','2024 Q1','2024 Q3','2025 Q1','2025 Q3','2025 Q4','2026 Q1','2026 Q2'],
+      datasets: [{
+        label: 'Median rent (HUF/sqm)',
+        data: [2895,3143,3333,3824,4054,4333,4630,4868,5106,5250,5263,5306,5333],
+        borderColor: orange,
+        backgroundColor: 'rgba(245,130,32,0.13)',
+        pointBackgroundColor: orange,
+        pointRadius: 3,
+        tension: 0.2,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, title: { display: true, text: 'Median rent per sqm over selected quarters, through 2026 Q2', color: black, font: { weight: 'bold' } } },
+      scales: {
+        x: { ticks: { maxRotation: 45, minRotation: 45 }, grid: { color: gridColor } },
+        y: { grid: { color: gridColor }, title: { display: true, text: 'HUF / sqm' } }
+      }
+    }
+  });
+
+  const lbModels = ['XGBoost','HistGB','LightGBM','Ridge','OLS','Random Forest','Extra Trees','District median','Dummy median'];
+  const lbMdape = [9.84,9.86,9.94,10.06,10.07,10.78,11.33,16.80,17.95];
+  new Chart(document.getElementById('chartLeaderboard'), {
+    type: 'bar',
+    data: {
+      labels: lbModels,
+      datasets: [{ label: 'Mean CV MdAPE (%)', data: lbMdape, backgroundColor: lbMdape.map((v, j) => j === 0 ? orange : (j < 5 ? orangeLight : 'rgba(17,17,17,0.25)')), borderColor: lbMdape.map((v, j) => j === 0 ? '#c85f00' : '#999'), borderWidth: 1 }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { color: gridColor }, title: { display: true, text: 'MdAPE (%)' } }, y: { grid: { display: false } } }
+    }
+  });
+
+  const fiLabels = ['log_area','area_size','room_density','neighborhood prior key','condition','property age','balcony / area','air conditioning','distance × area','coordinate X'];
+  const fiData = [0.0327,0.0142,0.0097,0.0095,0.0090,0.0070,0.0066,0.0047,0.0046,0.0043].map(v => +(v * 100).toFixed(2));
+  new Chart(document.getElementById('chartFeatureImportance'), {
+    type: 'bar',
+    data: { labels: fiLabels, datasets: [{ label: 'Permutation MdAPE increase (percentage points)', data: fiData, backgroundColor: orangeLight, borderColor: orange, borderWidth: 1 }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { color: gridColor }, title: { display: true, text: 'MdAPE increase, pp' } }, y: { grid: { display: false } } }
+    }
+  });
+
+  new Chart(document.getElementById('chartFolds'), {
+    type: 'bar',
+    data: {
+      labels: ['Fold 1','Fold 2','Fold 3','Fold 4','Fold 5'],
+      datasets: [
+        { label: 'XGBoost', data: [11.11,9.95,11.04,8.98,8.13], backgroundColor: orange, borderColor: '#c85f00', borderWidth: 1 },
+        { label: 'HistGradientBoosting', data: [11.13,9.81,11.32,8.79,8.25], backgroundColor: 'rgba(17,17,17,0.62)', borderColor: black, borderWidth: 1 },
+        { label: 'OLS', data: [10.79,10.21,11.90,8.99,8.46], backgroundColor: 'rgba(102,102,102,0.42)', borderColor: '#666', borderWidth: 1 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' } },
+      scales: { x: { grid: { display: false } }, y: { grid: { color: gridColor }, title: { display: true, text: 'MdAPE (%)' } } }
+    }
+  });
+})();
+</script>
+</body>
+</html>

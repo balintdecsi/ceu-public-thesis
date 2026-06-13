@@ -1,0 +1,206 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{mathptmx}
+\usepackage{courier}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{xurl}
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=blue!60!black]{hyperref}
+\usepackage{bookmark}
+\usepackage{setspace}
+
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0pt}
+\setlist{itemsep=0.15em,topsep=0.25em}
+\hypersetup{
+  pdftitle={Public summary: Real estate rental price prediction for ingatlan.com},
+  pdfsubject={MSc Business Analytics public summary},
+  pdfcreator={LaTeX},
+  pdfproducer={pdfLaTeX},
+  bookmarksopen=true
+}
+
+\newcommand{\thesistitle}{Real estate rental price prediction for ingatlan.com}
+\newcommand{\thesistitlecaps}{REAL ESTATE RENTAL PRICE PREDICTION FOR INGATLAN.COM}
+\newcommand{\thesissubtitle}{Budapest rental-flat pilot}
+\newcommand{\legalname}{Balint Decsi}
+\newcommand{\departmentname}{Department of Economics}
+\newcommand{\degreefullname}{Master of Science in Business Analytics}
+\newcommand{\supervisorname}{Eduardo Ariño de la Rubia}
+\newcommand{\submissionplace}{Vienna, Austria}
+\newcommand{\submissionmonthyear}{2026 June}
+\newcommand{\copyrightyear}{2026}
+\newcommand{\cclink}{https://creativecommons.org/licenses/by/4.0/}
+
+\begin{document}
+
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+\centering
+\vspace*{1.5em}
+{\Huge\bfseries \thesistitlecaps\par}
+\vspace{1em}
+{\Large \thesissubtitle\par}
+\vspace{2em}
+{\Large By\par}
+\vspace{1em}
+{\Large \legalname\par}
+\vspace{3em}
+{\large Submitted to Central European University -- Private University,\par}
+{\large \departmentname\par}
+\vspace{2em}
+{\large In partial fulfilment of the requirements for the degree of \degreefullname.\par}
+\vfill
+{\large Supervisor: \supervisorname\par}
+\vspace{2em}
+{\large \submissionplace\par}
+{\large \submissionmonthyear\par}
+\end{titlepage}
+
+\hypersetup{pageanchor=true}
+\pagenumbering{roman}
+\thispagestyle{plain}
+\section*{Creative Commons Copyright Notice}
+
+\noindent Copyright \copyright\ \legalname, \copyrightyear. \emph{\thesistitle}. This public summary is licensed under the Creative Commons Attribution (CC BY) 4.0 International license, available at \url{\cclink}.
+
+\bigskip
+\noindent For bibliographic and reference purposes, this public summary should be referred to as: Decsi, Balint. \copyrightyear. \emph{\thesistitle}. \thesissubtitle. Public summary, \departmentname, Central European University -- Private University, Vienna.
+
+\clearpage
+\thispagestyle{plain}
+\section*{Author's Declaration}
+
+\noindent I, \legalname, candidate for the degree of \degreefullname, declare herewith that the present public summary titled ``\thesistitle'' is exclusively my own work, based on my capstone research and only such external information as properly credited in notes and references.
+
+\medskip
+\noindent I declare that no unidentified and illegitimate use was made of the work of others, and no part of this public summary infringes any person's or institution's copyright.
+
+\medskip
+\noindent I also declare that no part of this public summary has been submitted in this form to any other institution of higher education for an academic degree.
+
+\medskip
+\noindent Vienna, 07 June 2026
+
+\clearpage
+\thispagestyle{plain}
+\section*{GenAI Declaration}
+
+\noindent Generative artificial intelligence (GenAI) was used in this work. I, the author, have reviewed and edited the content as needed and take full responsibility for the content, claims, and references. An overview of the use of GenAI is provided below.
+
+\begin{itemize}
+  \item I used OpenAI GPT 5.5 through a local coding-agent interface to support repository navigation, LaTeX restructuring, drafting support, and consistency checks against CEU formatting requirements. The tool was used to provide editing suggestions, file-generation assistance, and consolidation of requirement notes; I reviewed and revised the resulting material.
+\end{itemize}
+
+\clearpage
+\begin{abstract}
+This public summary describes a CEU MSc Business Analytics capstone project on Budapest rental price prediction for ingatlan.com. The project built an offline, reproducible analytics artifact to support a product question: whether ingatlan.com can provide a credible rent suggestion during listing upload so landlords price competitively and reduce time-on-market. The scope is Budapest rental flats, the target is monthly rent per square metre in HUF, and the primary metric is MdAPE, interpreted as a typical absolute percentage miss. The client-side success criterion is at most 10\% MdAPE in time-ordered cross-validation and holdout evaluation. The final artifact package includes warehouse and modelling notebooks, model reports, portable map and visual artifacts, documentation, and saved model artifacts. The best cross-validated model result reported in this public summary is 9.8\% MdAPE, below the client-side criterion, on a modelling sample of 50,898 rows. The same results also show a 17.6\% rent-per-square-metre shift in the reserved newest 20\% of listings, so the project recommendation is to treat the work as a strong offline benchmark and feature-readiness package rather than a production go-live approval. The proposed next steps are user-experience bands for suggestions, and a safe Budapest-only pilot.
+\end{abstract}
+
+\noindent\textbf{Keywords:} rental price prediction; real estate analytics; automated valuation model; Budapest; time-ordered validation.
+
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+\onehalfspacing
+
+\section{Purpose of the project}
+
+The capstone project, titled \emph{Budapest rental price prediction for listing upload}, was prepared as a reproducible artifact for ingatlan.com and CEU. Its product question is whether ingatlan.com can provide a credible rent suggestion during listing upload, helping landlords price competitively and ultimately reduce time-on-market. The project is explicitly an offline modelling and recommendation-support project; it is not production deployment or A/B testing.
+
+The modelling scope is Budapest rental flats. The prediction target is monthly rent per square metre in HUF. The main evaluation metric is MdAPE, a median absolute percentage error measure that summarises the typical percentage prediction miss. The client-side success criterion is at most 10\% MdAPE.
+
+\section{Artifact package}
+
+The artifact package is the following:
+
+\begin{itemize}
+  \item Warehouse and modelling notebooks covering medallion-structured layered data preparation, local modelling extracts, exploratory analysis, geospatial exploratory analysis, model comparison, tuning, and a holdout evaluation notebook.
+  \item Model reports, including leaderboard, feature-importance, and tuning-result CSV outputs.
+  \item Portable HTML maps and PNG explainability charts.
+  \item Documentation, including the project brief, warehouse/model decisions, and data dictionary.
+  \item Saved offline model artifacts.
+\end{itemize}
+
+This package is designed to make the work reviewable and reproducible for the data team of ingatlan.com Zrt.
+
+\section{Data and validation design}
+
+The strict modelling sample contains 50,898 Budapest rental-flat rows after downstream scope and quality filters, through 2026-06-02. The train/test design is time-based:
+
+\begin{table}[h]
+\centering
+\caption{Validation split used for the project}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Segment & Rows & Date range \\
+\midrule
+Train & 40,718 & 2021-01-01 to 2025-11-29 \\
+Reserved test & 10,180 & 2025-11-29 to 2026-06-02 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The exploratory data analysis shows a train median of 4,524 HUF/sqm and a reserved-test median of 5,319 HUF/sqm. This is a 17.6\% increase in the reserved newest period. The key validation implication is that random splits could leak market-regime information; candidate selection therefore uses time-ordered cross-validation on older listings, and the newest 20\% is reserved for a frozen holdout evaluation.
+
+\section{Model comparison results}
+
+The project reports a comparable cross-validation leaderboard in which all candidates use the same target, rolling time-series cross-validation, and metric. The top candidates are close: XGBoost, HistGradientBoosting, and LightGBM all sit around 9.8--9.9\% CV MdAPE, clearing the client-side 10\% criterion in cross-validation. OLS and Ridge are also competitive at about 10.1\%, which makes them useful transparent benchmarks.
+
+\begin{table}[h]
+\centering
+\caption{Cross-validation leaderboard for the project}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Model & CV MdAPE & CV MAPE & MAE HUF/sqm \\
+\midrule
+XGBoost log price/sqm & 9.84\% & 12.19\% & 629 \\
+HistGradientBoosting log price/sqm & 9.86\% & 12.24\% & 632 \\
+LightGBM log price/sqm & 9.94\% & 12.33\% & 635 \\
+Ridge log price/sqm & 10.06\% & 12.61\% & 646 \\
+OLS log price/sqm & 10.07\% & 12.58\% & 645 \\
+Random Forest & 10.78\% & 13.29\% & 693 \\
+Extra Trees & 11.33\% & 13.67\% & 717 \\
+District median HUF/sqm & 16.80\% & 19.32\% & 1,010 \\
+Dummy median & 17.95\% & 20.26\% & 1,067 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The project interpretation is that a complex model helps relative to simple baselines, but the incremental gain over a well-specified linear or hedonic-style model is modest in cross-validation. Stability and product fit therefore matter alongside raw model accuracy.
+
+\section{Feature story}
+
+The most product-relevant feature groups are size and layout, local comparable rent, condition, balcony ratio, air conditioning, and centrality/coordinates. The conclusion is that filling core structured fields matters more than making the user adding text or NLP at this stage. Neighborhood prior and location features show clear signal, validating the importance of geography and local comparable context.
+
+The model keeps a controlled set of interaction terms with clear formulas, such as distance to city center multiplied by log area, elevator status multiplied by floor number, room-count terms multiplied by log area, balcony-to-area ratio, and room density. The stated reason is to represent plausible housing-market effects without exploding the one-hot feature space.
+
+\section{Geospatial enrichment}
+
+Geospatial enrichment became a programmatic artifact rather than only an idea. The project includes lagged WorldPop features and Sentinel-2 NDVI greenness at H3 resolution, and portable map artifacts for listing prices, population context, NDVI, and anchor-point validation. I emphasize that geospatial features should remain lagged and source-dated to avoid leakage: to a listing in a given year, only geospatial data from the year before should be joined.
+
+\section{Risks and recommended next steps}
+
+The main risks I identified are temporal leakage or drift, aggregate metrics hiding local failures, missing optional fields, scope creep to national rentals, and the gap between model-error improvement and the ultimate time-on-market business metric. The corresponding mitigations are chronological splitting, rolling cross-validation, newest-period holdout design, district and property-subtype diagnostics, pipeline imputation, explicit Budapest pilot scope, and later linkage to time-on-market or experiment design.
+
+The final recommendation is to treat the current artifact as a strong offline benchmark and feature-readiness package, not as a production go-live approval. The recommended next steps are:
+
+\begin{enumerate}
+  \item Perform a more extensive district/subtype diagnostics.
+  \item Define user-experience bands that map prediction quality to exact suggestion, range suggestion, or no suggestion.
+  \item Pilot safely with Budapest rental flats only, monitor input coverage and prediction drift, and use the feature list to improve upload-field completion by prompting the user to fill in the most important property characteristics.
+\end{enumerate}
+
+The bottom line is that the project produced a credible, reproducible offline model artifact and a practical roadmap. The remaining decision is product governance, not more exploratory modelling.
+
+\section{Source and public-data boundary}
+
+This public summary intentionally uses only information approved by ingatlan.com Zrt. It excludes additional internal details, row-level data, and non-public technical-report content.
+
+\end{document}
