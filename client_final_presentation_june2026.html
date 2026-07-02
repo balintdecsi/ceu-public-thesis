@@ -283,7 +283,7 @@
     </div>
     <h1>Budapest rental price prediction for listing upload</h1>
     <div class="cover-rule"></div>
-    <p class="cover-subtitle">A reproducible capstone artifact for ingatlan.com’s data team: warehouse-to-model pipeline, temporal validation, geospatial enrichment, model diagnostics, maps, and product recommendations.</p>
+    <p class="cover-subtitle">A reproducible capstone artifact for ingatlan.com’s data team: end-to-end modelling pipeline, temporal validation, geospatial enrichment, model diagnostics, maps, and product recommendations.</p>
     <p class="muted" style="margin-top:2rem;"><strong>Bálint Décsi</strong> · MSc Business Analytics · Central European University</p>
   </section>
 
@@ -331,8 +331,8 @@
     <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Whole timeframe</div></div>
     <h1>Whole timeframe: what was built</h1>
     <div class="timeline">
-      <div class="timeline-row"><div><strong>30 Mar – early Apr</strong></div><div>Project initiation, sponsor framing, analytics brief, repository structure, uv environment, source dictionaries.</div></div>
-      <div class="timeline-row"><div><strong>April</strong></div><div>Bronze → silver → gold warehouse notebooks, local modelling extract, Budapest rental scope, first EDA, missingness/data-quality checks, transparent OLS baseline.</div></div>
+      <div class="timeline-row"><div><strong>30 Mar – early Apr</strong></div><div>Project initiation, sponsor framing, analytics brief, and scope definition.</div></div>
+      <div class="timeline-row"><div><strong>April</strong></div><div>Layered data preparation, modelling extract, Budapest rental scope, first EDA, missingness/data-quality checks, transparent OLS baseline.</div></div>
       <div class="timeline-row"><div><strong>7 May interim</strong></div><div>Interim deck presented: temporal validation discipline, candidate model leaderboard, early feature importance, and open questions on time series/geography.</div></div>
       <div class="timeline-row"><div><strong>Mid–late May</strong></div><div>Instructor/client feedback addressed: comparable OLS in the same CV framework, refreshed missingness, geospatial feature work, 90-day neighborhood prior, SHAP/permutation importance exports.</div></div>
       <div class="timeline-row"><div><strong>June</strong></div><div>Client-facing artifact package: presentation, model leaderboard, maps, feature diagnostics, pipeline documentation, and recommended path to pilot decision.</div></div>
@@ -346,16 +346,16 @@
       <div class="card">
         <h2>Methodology fixes</h2>
         <ul>
-          <li>OLS is now evaluated as <code>ols_log_price_per_sqm</code> in the same time-series CV as tree models.</li>
-          <li>The earlier OLS-vs-LightGBM split mismatch is no longer used as an apples-to-apples claim.</li>
-          <li>Refreshed missingness resolves the <code>building_floor_count</code> contradiction: ~21.7% missing, not 100%.</li>
+          <li>OLS is now evaluated in the same time-series CV as tree models.</li>
+          <li>The earlier OLS-vs-boosting split mismatch is no longer used as an apples-to-apples claim.</li>
+          <li>Refreshed missingness resolves the building-floor-count contradiction: ~21.7% missing, not 100%.</li>
         </ul>
       </div>
       <div class="card orange-card">
         <h2>New technical content</h2>
         <ul>
           <li>Lagged WorldPop and NDVI H3 feature pipelines.</li>
-          <li>Maps for 2025 listing prices, population context, GHSL probe, and NDVI.</li>
+          <li>Public geospatial context maps for NDVI greenness at H3 resolution.</li>
           <li>Neighborhood comparable-rent prior with 90-day lookback and local characteristic deltas.</li>
           <li>SHAP, permutation importance, and native model importance artifacts.</li>
         </ul>
@@ -367,12 +367,12 @@
     <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Artifact package</div></div>
     <h1>The artifact package</h1>
     <div class="artifact-grid">
-      <div class="card artifact-card"><h3>Warehouse + modelling notebooks</h3><p class="small"><code>dev/notebooks/01</code>–<code>04</code>, <code>10</code>, <code>11</code>, <code>20</code>, <code>21</code>, <code>22</code></p><p class="muted small">Reproducible path from warehouse layers to EDA, geo EDA, CV comparison, tuning, and holdout notebook scaffold.</p></div>
-      <div class="card artifact-card"><h3>Model reports</h3><p class="small"><a href="../../dev/reports/20_model_leaderboard.csv">20_model_leaderboard.csv</a><br/><a href="../../dev/reports/20_model_feature_importance.csv">20_model_feature_importance.csv</a><br/><a href="../../dev/reports/21_model_tuning_results.csv">21_model_tuning_results.csv</a></p><p class="muted small">CSV outputs for review, dashboarding, or handoff.</p></div>
-      <div class="card artifact-card"><h3>Maps + visuals</h3><p class="small"><a href="../../dev/visualization/11_geo_2025_price_listing_map.html">Price map</a><br/><a href="../../dev/visualization/11_geo_worldpop_2024_listing_map.html">WorldPop map</a><br/><a href="../../dev/visualization/11_geo_ndvi_h3_r8_map.html">NDVI H3 map</a></p><p class="muted small">Portable HTML maps and PNG explainability charts.</p></div>
-      <div class="card artifact-card"><h3>Documentation</h3><p class="small"><a href="real_estate_rental_price_prediction_project_brief.md">Project brief</a><br/><a href="../reference/warehouse_modeling_decisions.md">Warehouse/model decisions</a><br/><a href="../reference/warehouse_data_dictionary.md">Data dictionary</a></p><p class="muted small">Decision trace for modelling choices and leakage rules.</p></div>
-      <div class="card artifact-card"><h3>Model artifacts</h3><p class="small"><code>dev/models/*.joblib</code></p><p class="muted small">Saved candidate and tuned estimators for offline reproducibility.</p></div>
-      <div class="card artifact-card"><h3>This presentation</h3><p class="small"><code>docs/project/client_final_presentation_june2026.html</code></p><p class="muted small">Client-facing story; technical depth pushed to appendix.</p></div>
+      <div class="card artifact-card"><h3>Data preparation pipeline</h3><p class="muted small">Layered data build, modelling extract, EDA, geospatial enrichment, model comparison, tuning, and holdout evaluation scaffold.</p></div>
+      <div class="card artifact-card"><h3>Model reports</h3><p class="muted small">Cross-validation leaderboard, feature-importance tables, and tuning summaries for review and handoff.</p></div>
+      <div class="card artifact-card"><h3>Maps + visuals</h3><p class="muted small">NDVI greenness map and explainability charts bundled with this public presentation.</p></div>
+      <div class="card artifact-card"><h3>Documentation</h3><p class="muted small">Analytics brief, modelling decision notes, and leakage-control rationale.</p></div>
+      <div class="card artifact-card"><h3>Model artifacts</h3><p class="muted small">Serialized candidate and tuned estimators for offline reproducibility.</p></div>
+      <div class="card artifact-card"><h3>This presentation</h3><p class="muted small">Client-facing narrative deck; technical depth pushed to appendix.</p></div>
     </div>
   </section>
 
@@ -432,7 +432,7 @@
       <div class="card chart-box"><canvas id="chartFeatureImportance"></canvas></div>
       <div>
         <h2>Product-relevant feature groups</h2>
-        <p><span class="pill">size & layout</span><span class="pill">local comparables</span><span class="pill">condition</span><span class="pill">balcony ratio</span><span class="pill">air conditioning</span><span class="pill">centrality / coordinates</span></p>
+        <p><span class="pill">size & layout</span><span class="pill">local comparables</span><span class="pill">condition</span><span class="pill">balcony ratio</span><span class="pill">air conditioning</span><span class="pill">centrality</span></p>
         <ul>
           <li>Filling the core structured fields matters more than adding NLP at this stage.</li>
           <li>Neighborhood prior and location features show clear signal, validating the client team’s interim feedback.</li>
@@ -446,13 +446,13 @@
     <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Feature story</div></div>
     <h1>SHAP beeswarm: which features push predictions up or down</h1>
     <div class="two-col">
-      <div class="card"><img class="img-frame" src="../../dev/visualization/20_best_model_shap_beeswarm.png" alt="SHAP beeswarm" /></div>
+      <div class="card"><img class="img-frame" src="presentation_assets/20_best_model_shap_beeswarm.png" alt="SHAP beeswarm" /></div>
       <div>
         <h2>How to read it</h2>
         <ul>
-          <li>Each dot is one sampled listing; horizontal position is the SHAP contribution to the predicted log HUF/sqm.</li>
+          <li>Each dot is one held-out observation in the explanation sample; horizontal position is the SHAP contribution to the predicted log HUF/sqm.</li>
           <li>Dots to the right increase the model prediction; dots to the left decrease it.</li>
-          <li>Colour shows whether that feature value is high or low for the listing.</li>
+          <li>Colour shows whether that feature value is high or low for the observation.</li>
           <li>Use this for transparency and sanity checks, not as a causal statement.</li>
         </ul>
         <div class="callout"><strong>Product use:</strong> the same logic can support a local “what drives this estimate” explanation for a landlord-facing rent suggestion.</div>
@@ -467,13 +467,13 @@
     <table class="simple">
       <thead><tr><th>Term</th><th>Formula</th><th>Interpretation</th></tr></thead>
       <tbody>
-        <tr><td><code>distance_x_log_area</code></td><td><code>distance_to_city_center_km × ln(area_size)</code></td><td>Centrality gradient can differ for small vs. large flats.</td></tr>
-        <tr><td><code>has_balcony_x_distance_to_center</code></td><td><code>1[balcony_size &gt; 0] × distance_to_city_center_km</code></td><td>Balcony premium may vary with centrality.</td></tr>
-        <tr><td><code>elevator_x_floor_num</code></td><td><code>1[has_elevator] × floor_num</code></td><td>Higher floors are valued differently when an elevator exists.</td></tr>
-        <tr><td><code>total_room_equiv_x_log_area</code></td><td><code>(room_count + 0.5 × small_room_count) × ln(area_size)</code></td><td>Layout usefulness interacts with flat size.</td></tr>
-        <tr><td><code>room_count_x_log_area</code></td><td><code>room_count × ln(area_size)</code></td><td>Room count can matter differently by size.</td></tr>
-        <tr><td><code>balcony_to_area_ratio</code></td><td><code>clip(balcony_size / area_size, 0, 0.5)</code></td><td>A bounded ratio, not simple multiplication.</td></tr>
-        <tr><td><code>room_density</code></td><td><code>(room_count + 0.5 × small_room_count) / area_size</code></td><td>Captures compactness of the layout.</td></tr>
+        <tr><td>Distance × log area</td><td>Centrality gradient × log floor area</td><td>Centrality gradient can differ for small vs. large flats.</td></tr>
+        <tr><td>Balcony × distance</td><td>Balcony indicator × distance to centre</td><td>Balcony premium may vary with centrality.</td></tr>
+        <tr><td>Elevator × floor</td><td>Elevator indicator × floor number</td><td>Higher floors are valued differently when an elevator exists.</td></tr>
+        <tr><td>Room equivalent × log area</td><td>Effective room count × log floor area</td><td>Layout usefulness interacts with flat size.</td></tr>
+        <tr><td>Room count × log area</td><td>Room count × log floor area</td><td>Room count can matter differently by size.</td></tr>
+        <tr><td>Balcony-to-area ratio</td><td>Balcony size / floor area (capped)</td><td>A bounded ratio, not simple multiplication.</td></tr>
+        <tr><td>Room density</td><td>Effective room count / floor area</td><td>Captures compactness of the layout.</td></tr>
       </tbody>
     </table>
     <div class="callout black"><strong>Why this matters:</strong> these terms let the model represent plausible housing-market effects without exploding the one-hot feature space.</div>
@@ -485,41 +485,20 @@
     <div class="three-col">
       <div class="card orange-card"><h2>WorldPop</h2><ul><li>Hungary rasters for 2020–2025.</li><li>H3 resolutions 6, 7, 8.</li><li>Total population and age/sex cohorts.</li><li>Lag rule: 2025 listing → 2024 features.</li></ul></div>
       <div class="card orange-card"><h2>NDVI greenness</h2><ul><li>Sentinel-2 L2A via Microsoft Planetary Computer.</li><li>Summer composites for 2020–2025.</li><li>H3 mean / p90 / pixel count.</li><li>Prototype point coverage: ~100%.</li></ul></div>
-      <div class="card"><h2>Maps</h2><ul><li>2025 price listing map.</li><li>WorldPop map in the main deck; GHSL probe in the appendix.</li><li>NDVI anchor and H3 map.</li><li>All are portable local HTML artifacts.</li></ul></div>
+      <div class="card"><h2>Maps</h2><ul><li>Sentinel-2 NDVI aggregated to H3 cells (public satellite context).</li><li>Listing-level price and population probe maps are omitted from the public release.</li></ul></div>
     </div>
     <div class="callout black">Geospatial features should remain lagged and source-dated to avoid leakage. Static land cover is useful for EDA but less aligned with historized model validation.</div>
   </section>
 
   <section class="slide" data-slide="14">
-    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Main deck map · 1/4</div></div>
-    <h1>Map: 2025 listing prices in Budapest</h1>
-    <iframe class="map-frame" src="../../dev/visualization/11_geo_2025_price_listing_map.html" title="2025 listing price map"></iframe>
-    <p class="muted small">Use this to inspect spatial clustering of high and low rent-per-square-metre listings in the most recent period.</p>
+    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Geospatial map</div></div>
+    <h1>Map: Sentinel-2 NDVI at H3 resolution 8</h1>
+    <iframe class="map-frame" src="presentation_assets/11_geo_ndvi_h3_r8_map.html" title="NDVI H3 r8 map"></iframe>
+    <p class="muted small">Historized summer greenness aggregated to local H3 cells from public Sentinel-2 data; useful for checking whether green-space proxies behave plausibly around Budapest.</p>
   </section>
+
 
   <section class="slide" data-slide="15">
-    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Main deck map · 2/4</div></div>
-    <h1>Map: lagged WorldPop context</h1>
-    <iframe class="map-frame" src="../../dev/visualization/11_geo_worldpop_2024_listing_map.html" title="WorldPop 2024 listing map"></iframe>
-    <p class="muted small">2025 listing points sampled against 2024 population context, following the lag rule used to avoid geo-feature leakage.</p>
-  </section>
-
-  <section class="slide" data-slide="16">
-    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Main deck map · 3/4</div></div>
-    <h1>Map: Sentinel-2 NDVI at H3 resolution 8</h1>
-    <iframe class="map-frame" src="../../dev/visualization/11_geo_ndvi_h3_r8_map.html" title="NDVI H3 r8 map"></iframe>
-    <p class="muted small">Historized summer greenness aggregated to local H3 cells; useful for checking whether green-space proxies behave plausibly around Budapest.</p>
-  </section>
-
-  <section class="slide" data-slide="17">
-    <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Main deck map · 4/4</div></div>
-    <h1>Map: NDVI anchor points</h1>
-    <iframe class="map-frame" src="../../dev/visualization/11_geo_ndvi_anchor_map.html" title="NDVI anchor map"></iframe>
-    <p class="muted small">Point-level validation artifact for the NDVI join, showing anchor listings and coverage before promoting NDVI to model features.</p>
-  </section>
-
-
-  <section class="slide" data-slide="18">
     <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Product implications</div></div>
     <h1>Implications for the upload flow</h1>
     <div class="two-col">
@@ -530,7 +509,7 @@
           <li>Condition, comfort, subtype, heating.</li>
           <li>Balcony size relative to area.</li>
           <li>Air conditioning and equipment flags.</li>
-          <li>High-quality location: district, zone, coordinates/street enough for local comparable signal.</li>
+          <li>High-quality location: district, zone, and enough address detail for local comparable signal.</li>
         </ul>
       </div>
       <div class="card">
@@ -545,7 +524,7 @@
     </div>
   </section>
 
-  <section class="slide" data-slide="19">
+  <section class="slide" data-slide="16">
     <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Risks</div></div>
     <h1>Risks and mitigations</h1>
     <table class="simple">
@@ -560,18 +539,18 @@
     </table>
   </section>
 
-  <section class="slide" data-slide="20">
+  <section class="slide" data-slide="17">
     <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Recommendation</div></div>
     <h1>Recommended next steps with ingatlan.com</h1>
     <div class="three-col">
-      <div class="card orange-card"><h2>1 · Freeze evaluation</h2><p>Run notebook 22 as a controlled one-shot holdout, then publish final MdAPE/MAPE/RMSE, total-rent errors, coverage, and district/subtype diagnostics.</p></div>
+      <div class="card orange-card"><h2>1 · Freeze evaluation</h2><p>Run a controlled one-shot holdout, then publish final MdAPE/MAPE/RMSE, total-rent errors, coverage, and district/subtype diagnostics.</p></div>
       <div class="card orange-card"><h2>2 · Define UX bands</h2><p>Use the client’s 10% MdAPE criterion as the offline target, then decide how it maps to product behaviour: exact suggestion, range suggestion, or no suggestion.</p></div>
       <div class="card orange-card"><h2>3 · Pilot safely</h2><p>Start with Budapest rental flats only, monitor input coverage and prediction drift, and use the artifact’s feature list to improve upload-field completion.</p></div>
     </div>
     <div class="callout green"><strong>Bottom line:</strong> the project produced a credible, reproducible offline model artifact and a practical roadmap. The remaining decision is product governance, not more exploratory modelling.</div>
   </section>
 
-  <section class="slide" data-slide="21">
+  <section class="slide" data-slide="18">
     <div class="topline"><div class="brand-lockup"><span class="ingatlan-logo">ingatlan<span class="dot">.com</span></span><span class="ceu-badge">CEU</span></div><div>Discussion</div></div>
     <h1>Discussion questions</h1>
     <div class="two-col">
@@ -583,14 +562,8 @@
 
   <!-- Appendix -->
 
-  <section class="slide" data-slide="22">
-    <div class="appendix-banner">Appendix A — GHSL population probe map</div>
-    <h1>Map: GHSL population probe</h1>
-    <iframe class="map-frame" src="../../dev/visualization/11_geo_ghs_pop_listing_map.html" title="GHSL population probe map"></iframe>
-    <p class="muted small">Exploratory comparison source. Current GHSL file is useful for CRS and coverage testing, but not treated as the preferred lagged 2024 feature.</p>
-  </section>
-  <section class="slide" data-slide="23">
-    <div class="appendix-banner">Appendix B — full current CV leaderboard</div>
+  <section class="slide" data-slide="19">
+    <div class="appendix-banner">Appendix A — full current CV leaderboard</div>
     <h1>CV leaderboard table</h1>
     <table class="simple">
       <thead><tr><th>Model</th><th class="num">CV MdAPE</th><th class="num">CV MAPE</th><th class="num">MAE HUF/sqm</th><th>Comment</th></tr></thead>
@@ -608,73 +581,56 @@
     </table>
   </section>
 
-  <section class="slide" data-slide="24">
-    <div class="appendix-banner">Appendix C — fold-level stability</div>
+  <section class="slide" data-slide="20">
+    <div class="appendix-banner">Appendix B — fold-level stability</div>
     <h1>Fold-level MdAPE for top candidates</h1>
     <div class="card chart-box"><canvas id="chartFolds"></canvas></div>
-    <p class="muted small">Fold-level scores are from <code>dev/reports/20_model_cv_fold_metrics.csv</code>. The current target/features reduced the extreme fold instability shown in the interim deck, but holdout and district slices remain required.</p>
+    <p class="muted small">Fold-level scores from the cross-validation run. The current target/features reduced the extreme fold instability shown in the interim deck, but holdout and district slices remain required.</p>
   </section>
 
-  <section class="slide" data-slide="25">
-    <div class="appendix-banner">Appendix D — feature policy and leakage controls</div>
+  <section class="slide" data-slide="21">
+    <div class="appendix-banner">Appendix C — feature policy and leakage controls</div>
     <h1>Model feature policy</h1>
     <div class="two-col">
-      <div class="card"><h2>Included</h2><ul><li>Core property structure: area, rooms, floor, age.</li><li>Quality/amenity fields: condition, comfort, subtype, furnishment, heating, balcony, aircon.</li><li>Location: district and zone level 1 one-hot, coordinates, distance to center.</li><li>Fold-safe 90-day neighborhood prior and local deltas.</li><li>Lagged WorldPop and NDVI features.</li></ul></div>
-      <div class="card"><h2>Excluded / constrained</h2><ul><li><code>price_per_sqm_huf</code> is the target, never a feature.</li><li>Total <code>price_huf</code> is not a feature.</li><li>Street/geo-cell identifiers are not directly one-hot encoded.</li><li>Text bodies are not used; only language-presence flags.</li><li>Model-specific filters stay downstream of the gold warehouse.</li></ul></div>
+      <div class="card"><h2>Included</h2><ul><li>Core property structure: area, rooms, floor, age.</li><li>Quality/amenity fields: condition, comfort, subtype, furnishment, heating, balcony, aircon.</li><li>Location: district and zone aggregates, distance to centre.</li><li>Fold-safe 90-day neighbourhood prior and local deltas.</li><li>Lagged WorldPop and NDVI features.</li></ul></div>
+      <div class="card"><h2>Excluded / constrained</h2><ul><li>Rent per sqm is the target, never a feature.</li><li>Total rent is not a feature.</li><li>Fine-grained street or geo-cell identifiers are not directly encoded.</li><li>Listing text bodies are not used; only language-presence flags.</li><li>Model-specific filters stay downstream of the curated modelling table.</li></ul></div>
     </div>
   </section>
 
-  <section class="slide" data-slide="26">
-    <div class="appendix-banner">Appendix E — missingness and data quality</div>
+  <section class="slide" data-slide="22">
+    <div class="appendix-banner">Appendix D — missingness and data quality</div>
     <h1>Key data-quality points</h1>
     <table class="simple">
-      <thead><tr><th>Check</th><th>Current artifact value</th><th>Action / interpretation</th></tr></thead>
+      <thead><tr><th>Check</th><th>Result</th><th>Action / interpretation</th></tr></thead>
       <tbody>
-        <tr><td>Duplicate listing ID</td><td>0</td><td>OK in current EDA artifact.</td></tr>
-        <tr><td>Non-positive target / area</td><td>0</td><td>OK after downstream filters.</td></tr>
-        <tr><td>Invalid coordinates after Budapest bounds</td><td>598 rows (~1.1% in EDA extract)</td><td>Use coverage guardrail; avoid forced coordinate features when location quality is weak.</td></tr>
-        <tr><td><code>building_floor_count</code> missing</td><td>21.68%</td><td>Resolved interim contradiction; imputed inside CV folds.</td></tr>
-        <tr><td><code>common_charges</code> missing</td><td>72.16%</td><td>Useful when present but not safe as mandatory UI dependency.</td></tr>
-        <tr><td><code>utility_costs</code> missing</td><td>48.44%</td><td>Impute and monitor; potentially improve upload completion.</td></tr>
+        <tr><td>Duplicate records</td><td>None observed</td><td>Passes basic uniqueness checks.</td></tr>
+        <tr><td>Non-positive target / area</td><td>None after filters</td><td>OK after downstream scope rules.</td></tr>
+        <tr><td>Weak location quality</td><td>~1% of rows</td><td>Use coverage guardrail; avoid forcing location features when quality is weak.</td></tr>
+        <tr><td>Building floor count missing</td><td>~22%</td><td>Resolved interim contradiction; imputed inside CV folds.</td></tr>
+        <tr><td>Common charges missing</td><td>~72%</td><td>Useful when present but not safe as mandatory UI dependency.</td></tr>
+        <tr><td>Utility costs missing</td><td>~48%</td><td>Impute and monitor; potentially improve upload completion.</td></tr>
       </tbody>
     </table>
   </section>
 
-  <section class="slide" data-slide="27">
-    <div class="appendix-banner">Appendix F — SHAP group importance artifact</div>
+  <section class="slide" data-slide="23">
+    <div class="appendix-banner">Appendix E — SHAP group importance</div>
     <h1>SHAP group importance</h1>
-    <img class="img-frame" src="../../dev/visualization/20_best_model_shap_group_importance.png" alt="SHAP group importance" />
+    <img class="img-frame" src="presentation_assets/20_best_model_shap_group_importance.png" alt="SHAP group importance" />
     <p class="muted small">SHAP values explain log HUF/sqm predictions on a sample, so magnitudes are in log-points, not raw HUF. Use for explanation and sanity checks, not causal claims.</p>
   </section>
 
-  <section class="slide" data-slide="28">
-    <div class="appendix-banner">Appendix G — permutation importance artifact</div>
+  <section class="slide" data-slide="24">
+    <div class="appendix-banner">Appendix F — permutation importance</div>
     <h1>Permutation importance</h1>
-    <img class="img-frame" src="../../dev/visualization/20_best_model_permutation_importance.png" alt="Permutation importance" />
-  </section>
-
-  <section class="slide" data-slide="29">
-    <div class="appendix-banner">Appendix H — technical/reproducibility map</div>
-    <h1>Where the work lives</h1>
-    <table class="simple">
-      <thead><tr><th>Area</th><th>Path</th><th>Purpose</th></tr></thead>
-      <tbody>
-        <tr><td>Warehouse notebooks</td><td><code>dev/notebooks/01_warehouse_bronze_layer.ipynb</code> → <code>03_warehouse_gold_layer.ipynb</code></td><td>Layered data preparation.</td></tr>
-        <tr><td>Modelling dataset</td><td><code>dev/notebooks/04_build_modeling_dataset.ipynb</code></td><td>Scope filters and chronological split.</td></tr>
-        <tr><td>EDA</td><td><code>dev/notebooks/10_eda_rental_price_local.ipynb</code></td><td>Missingness, target, temporal and feature diagnostics.</td></tr>
-        <tr><td>Geo EDA</td><td><code>dev/notebooks/11_geo_eda.ipynb</code></td><td>WorldPop/GHSL/NDVI probes and maps.</td></tr>
-        <tr><td>Model comparison</td><td><code>dev/notebooks/20_rental_price_prediction.ipynb</code></td><td>CV leaderboard and explainability exports.</td></tr>
-        <tr><td>Tuning</td><td><code>dev/notebooks/21_rental_price_tuning.ipynb</code></td><td>Best-candidate hyperparameter search.</td></tr>
-        <tr><td>Holdout scaffold</td><td><code>dev/notebooks/22_rental_price_holdout_testing.ipynb</code></td><td>Reserved newest 20% evaluation path.</td></tr>
-      </tbody>
-    </table>
+    <img class="img-frame" src="presentation_assets/20_best_model_permutation_importance.png" alt="Permutation importance" />
   </section>
 
 </div>
 
 <div class="footer-bar">
   <span>ingatlan.com × CEU capstone · Budapest rental price prediction</span>
-  <span><kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> · slide <span id="cur">1</span> / <span id="tot">29</span></span>
+  <span><kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> · slide <span id="cur">1</span> / <span id="tot">24</span></span>
 </div>
 
 <script>
@@ -749,7 +705,7 @@
     }
   });
 
-  const fiLabels = ['log_area','area_size','room_density','neighborhood prior key','condition','property age','balcony / area','air conditioning','distance × area','coordinate X'];
+  const fiLabels = ['log area','floor area','room density','neighbourhood prior','condition','property age','balcony / area','air conditioning','distance × area','location axis'];
   const fiData = [0.0327,0.0142,0.0097,0.0095,0.0090,0.0070,0.0066,0.0047,0.0046,0.0043].map(v => +(v * 100).toFixed(2));
   new Chart(document.getElementById('chartFeatureImportance'), {
     type: 'bar',
